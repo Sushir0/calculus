@@ -61,7 +61,7 @@ class GameEngine @AssistedInject constructor(
         val currentState = _gameState.value as? GameState.Playing ?: return
         val now = Clock.System.now()
 
-        updateHistory(currentState.currentProblem, answer, now)
+        updateHistory(currentState.currentProblem, answer, startedAt = currentProblemStartTime ?: now)
 
         if(shouldEnd(currentState.currentRound, Clock.System.now())){
             endGame(now)
