@@ -39,7 +39,7 @@ data class ArithmeticConfig(
                     options.numberOfOptions < 2 -> ArithmeticConfigError.TooFewOptions
                     options.numberOfOptions > 6 -> ArithmeticConfigError.TooManyOptions
                     options.specificConfig.randomOffsetRange < 1 -> ArithmeticConfigError.OffsetRangeTooSmall
-                    (options.specificConfig.randomOffsetRange * 2) < (options.numberOfOptions - 1) -> ArithmeticConfigError.OffsetRangeTooSmall
+                    (options.specificConfig.randomOffsetRange) < (options.numberOfOptions - 1) -> ArithmeticConfigError.OffsetRangeTooSmall
                     else -> null
                 }
                 else -> null
