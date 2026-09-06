@@ -40,23 +40,23 @@ class OffByOneStrategyTest {
     }
 
     @Test
-    fun `canApply should return false when negative is not allowed and potential trap is negative`() {
+    fun `canApply should return true for binary expressions even when result is zero and negatives are disallowed`() {
         val config = defaultConfig.copy(allowNegativeNumbers = false)
-        // Result is 0. Potential traps: 1 (ok) or -1 (not allowed).
-        val expression = Expression.Binary(
-            left = Expression.Number(0.0),
-            right = Expression.Number(0.0),
-            operator = Operation.Add
-        )
+        val expression = Expression.Binary(Expression.Number(0.0), Expression.Number(0.0), Operation.Add)
 
-        var sawTrue = false
-        var sawFalse = false
+        assertTrue(OffByOneStrategyArithmetic.canApply(expression, config))
+    }
+
+    @Test
+    fun `getWrongNumber should always force positive offset when negatives are disallowed and value is zero`() {
+        val config = defaultConfig.copy(allowNegativeNumbers = false)
+        // 0 + 0 = 0. Como não permite negativos, a trap DEVE ser obrigatoriamente 0 + 1 = 1
+        val expression = Expression.Binary(Expression.Number(0.0), Expression.Number(0.0), Operation.Add)
+
         repeat(100) {
-            if (OffByOneStrategyArithmetic.canApply(expression, config)) sawTrue = true
-            else sawFalse = true
+            val wrongNumber = OffByOneStrategyArithmetic.getWrongNumber(expression, config)
+            assertEquals("Deveria forçar +1 e nunca gerar -1", 1.0, wrongNumber, 0.0)
         }
-        assertTrue("Should be able to return true when random chooses +1", sawTrue)
-        assertTrue("Should be able to return false when random chooses -1", sawFalse)
     }
 
     @Test

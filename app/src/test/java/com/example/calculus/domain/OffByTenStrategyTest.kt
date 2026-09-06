@@ -41,27 +41,23 @@ class OffByTenStrategyTest {
     }
 
     @Test
-    fun `canApply should return false when negative is not allowed and potential trap is negative`() {
+    fun `canApply should return true for binary expressions even when result is less than 10 and negatives are disallowed`() {
         val config = defaultConfig.copy(allowNegativeNumbers = false)
-        // Result is 5. Potential traps: 15 (ok) or -5 (not allowed).
-        // Since canApply is currently non-deterministic in implementation, 
-        // we check that it behavior is consistent with the random choice.
-        val expression = Expression.Binary(
-            left = Expression.Number(2.0),
-            right = Expression.Number(3.0),
-            operator = Operation.Add
-        )
+        val expression = Expression.Binary(Expression.Number(2.0), Expression.Number(3.0), Operation.Add) // 2 + 3 = 5
 
-        // Note: In a real scenario, we might want canApply to be deterministic.
-        // But testing the current implementation:
-        var sawTrue = false
-        var sawFalse = false
+        assertTrue(OffByTenStrategyArithmetic.canApply(expression, config))
+    }
+
+    @Test
+    fun `getWrongNumber should always force positive offset when negatives are disallowed and value is less than 10`() {
+        val config = defaultConfig.copy(allowNegativeNumbers = false)
+        // 2 + 3 = 5. Como 5 - 10 daria -5 (proibido), a trap DEVE ser obrigatoriamente 5 + 10 = 15
+        val expression = Expression.Binary(Expression.Number(2.0), Expression.Number(3.0), Operation.Add)
+
         repeat(100) {
-            if (OffByTenStrategyArithmetic.canApply(expression, config)) sawTrue = true
-            else sawFalse = true
+            val wrongNumber = OffByTenStrategyArithmetic.getWrongNumber(expression, config)
+            assertEquals("Deveria forçar +10 e nunca gerar -5", 15.0, wrongNumber, 0.0)
         }
-        assertTrue("Should be able to return true when random chooses +10", sawTrue)
-        assertTrue("Should be able to return false when random chooses -10", sawFalse)
     }
 
     @Test
