@@ -41,19 +41,53 @@ class ArithmeticProblemGenerator(
     }
 
     private fun generateExpression(): Expression {
-        val expressionLength = config.expressionRange.random()
-        var expression: Expression = Expression.Number(generateNumber().toDouble())
+        var attempts = 0
+        val maxGlobalAttempts = 20
 
-        repeat(expressionLength - 1) {
-            val operation = generateOperation()
-            val nextNumber = generateOperand(operation)
-            expression = Expression.Binary(
-                left = expression,
-                right = nextNumber,
-                operator = operation
+        while (attempts < maxGlobalAttempts) {
+            attempts++
+            val candidate = buildRandomExpression(config.expressionRange.random())
+
+            if (config.allowNegativeNumbers || candidate.evaluate() >= 0.0) {
+                return candidate
+            }
+        }
+
+        val a = config.valueRange.random().coerceAtLeast(1)
+        val b = config.valueRange.random().coerceAtLeast(1)
+        return Expression.Binary(Expression.Number(a.toDouble()), Expression.Number(b.toDouble()), Operation.Add)
+    }
+
+    private fun buildRandomExpression(length: Int): Expression {
+        if (length == 2) {
+            val op = generateOperation()
+            var a = generateOperand(op)
+            var b = generateOperand(op)
+
+            if (!config.allowNegativeNumbers && op == Operation.Subtract) {
+                if (a.evaluate() < b.evaluate()) {
+                    val temp = a
+                    a = b
+                    b = temp
+                }
+            }
+            return Expression.Binary(left = a, right = b, operator = op)
+        }
+
+        var currentExpression: Expression = Expression.Number(generateNumber().toDouble())
+
+        for (i in 1 until length) {
+            val op = generateOperation()
+            val nextOperand = generateOperand(op)
+
+            currentExpression = Expression.Binary(
+                left = currentExpression,
+                right = nextOperand,
+                operator = op
             )
         }
-        return expression
+
+        return currentExpression
     }
 
     private fun generateOperand(operation: Operation): Expression.Number {

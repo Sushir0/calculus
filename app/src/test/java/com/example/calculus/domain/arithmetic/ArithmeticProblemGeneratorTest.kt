@@ -11,6 +11,29 @@ import org.junit.Test
 class ArithmeticProblemGeneratorTest {
 
     @Test
+    fun `generateProblem should NEVER generate negative answers when allowNegativeNumbers is false`() {
+        val nonNegativeConfig = ArithmeticConfig(
+            operations = setOf(Operation.Add, Operation.Subtract, Operation.Multiply, Operation.Divide),
+            valueRange = 1..20,
+            expressionRange = 2..4, // Testa contas com 2, 3 e 4 termos!
+            allowNegativeNumbers = false
+        )
+
+        val generator = ArithmeticProblemGenerator(nonNegativeConfig)
+
+        // Roda 1.000 vezes consecutivas para forçar qualquer combinação matemática
+        repeat(1000) {
+            val problem = generator.generateProblem()
+            val result = (problem.correctAnswer.value as AnswerValue.ArithmeticValue).value
+
+            assertTrue(
+                "Gerou um resultado negativo indesejado: ${problem.prompt} = $result",
+                result >= 0.0
+            )
+        }
+    }
+
+    @Test
     fun `generateProblem should return a valid MathProblem`() {
         val config = ArithmeticConfig(
             operations = setOf(Operation.Add, Operation.Subtract, Operation.Multiply),
