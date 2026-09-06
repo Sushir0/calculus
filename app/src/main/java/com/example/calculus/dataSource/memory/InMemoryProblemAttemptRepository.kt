@@ -2,6 +2,7 @@ package com.example.calculus.dataSource.memory
 
 import com.example.calculus.domain.repository.ProblemAttemptRepository
 import com.example.calculus.domain.model.ProblemAttempt
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -10,7 +11,7 @@ import java.util.UUID
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
-class InMemoryProblemAttemptRepository : ProblemAttemptRepository {
+class InMemoryProblemAttemptRepository @Inject constructor() : ProblemAttemptRepository {
     private val _attempts = MutableStateFlow<Map<String, ProblemAttempt>>(emptyMap())
 
     override suspend fun save(problemAttempt: ProblemAttempt): Result<Unit> {

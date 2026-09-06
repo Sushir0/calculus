@@ -13,9 +13,24 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+
+class GameEngineFactory @Inject constructor(
+    private val problemAttemptRepository: ProblemAttemptRepository,
+    private val gameSummaryRepository: GameSummaryRepository,
+) {
+    fun create(gameMode: GameMode, problemGenerator: ProblemGenerator): GameEngine {
+        return GameEngine(
+            gameMode = gameMode,
+            problemGenerator = problemGenerator,
+            problemAttemptRepository = problemAttemptRepository,
+            gameSummaryRepository = gameSummaryRepository,
+        )
+    }
+}
 
 @OptIn(ExperimentalTime::class)
 class GameEngine(

@@ -4,6 +4,7 @@ import com.example.calculus.domain.repository.GameSummaryRepository
 import com.example.calculus.domain.game.model.GameSummary
 import com.example.calculus.domain.problemGenerator.GameConfig
 import com.example.calculus.domain.problemGenerator.arithmetic.ArithmeticConfig
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -12,7 +13,7 @@ import java.util.UUID
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
-class InMemoryGameSummaryRepository : GameSummaryRepository {
+class InMemoryGameSummaryRepository @Inject constructor() : GameSummaryRepository {
     private val _summaries = MutableStateFlow<Map<String, GameSummary>>(emptyMap())
 
     override suspend fun save(gameSummary: GameSummary): Result<Unit> {
