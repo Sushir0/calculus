@@ -11,6 +11,7 @@ import com.example.calculus.domain.trap.arithmetic.OffByTenStrategyArithmetic
 import com.example.calculus.domain.trap.arithmetic.SignFlipStrategyArithmetic
 import com.example.calculus.domain.trap.arithmetic.ArithmeticTrapStrategy
 import com.example.calculus.domain.trap.arithmetic.WrongOperatorStrategyArithmetic
+import kotlin.math.abs
 import kotlin.random.Random
 
 class ArithmeticAnswerOrganizer(
@@ -37,7 +38,9 @@ class ArithmeticAnswerOrganizer(
         )
 
         selectedStrategy?.let {
-            options.add(Answer.Trap(value = AnswerValue.ArithmeticValue(it.second.getWrongNumber(expression, config)), type = it.first) )
+            val trapValue = it.second.getWrongNumber(expression, config)
+            if (abs(trapValue - expression.evaluate()) < 0.0001) return@let
+            options.add(Answer.Trap(value = AnswerValue.ArithmeticValue(trapValue), type = it.first) )
         }
 
         fillWithRandomOptions(
@@ -98,6 +101,9 @@ class ArithmeticAnswerOrganizer(
 
             val candidateNumber = correctAnswer + offset
             if (!allowNegativeNumbers && candidateNumber < 0) continue
+
+            val alreadyExists = existingOptions.any { abs((it.value as AnswerValue.ArithmeticValue).value - AnswerValue.ArithmeticValue(candidateNumber).value) < 0.0001 }
+            if (alreadyExists) continue
 
             val candidate = Answer.Wrong(AnswerValue.ArithmeticValue(candidateNumber))
 
