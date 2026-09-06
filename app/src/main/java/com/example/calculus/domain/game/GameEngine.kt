@@ -9,6 +9,9 @@ import com.example.calculus.domain.model.answer.Answer
 import com.example.calculus.domain.problemGenerator.ProblemGenerator
 import com.example.calculus.domain.repository.GameSummaryRepository
 import com.example.calculus.domain.repository.ProblemAttemptRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,27 +21,17 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-class GameEngineFactory @Inject constructor(
-    private val problemAttemptRepository: ProblemAttemptRepository,
-    private val gameSummaryRepository: GameSummaryRepository,
-) {
-    fun create(gameMode: GameMode, problemGenerator: ProblemGenerator): GameEngine {
-        return GameEngine(
-            gameMode = gameMode,
-            problemGenerator = problemGenerator,
-            problemAttemptRepository = problemAttemptRepository,
-            gameSummaryRepository = gameSummaryRepository,
-        )
-    }
-}
-
 @OptIn(ExperimentalTime::class)
-class GameEngine(
-    private val gameMode: GameMode,
-    private val problemGenerator: ProblemGenerator,
+class GameEngine @AssistedInject constructor(
+    @Assisted private val gameMode: GameMode,
+    @Assisted private val problemGenerator: ProblemGenerator,
     private val problemAttemptRepository: ProblemAttemptRepository,
     private val gameSummaryRepository: GameSummaryRepository,
 ) {
+    @AssistedFactory
+    interface Factory {
+        fun create(gameMode: GameMode, problemGenerator: ProblemGenerator): GameEngine
+    }
     private val _gameState = MutableStateFlow<GameState>(GameState.Idle)
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
